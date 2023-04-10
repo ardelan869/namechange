@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/css/config.css">
+</head>
+
+<body style="display: none;">
+
+    <div class="container">
+
+        <button class="close" onclick="display(false)">SCHLIESSEN</button>
+
+        <div class="header">
+            <h1>Trage deinen Wunsch-Namen hier ein...</h1>
+        </div>
+
+        <div class="bgbox">
+            <input class="first" type="text" placeholder="Vorname...">
+            <input class="last" type="text" placeholder="Nachname...">
+            <div class="fcheckerbox"></div>
+            <div class="lcheckerbox"></div>
+            <button class="confirm" onclick="getName()">BESTÄTIGEN</button>
+        </div>
+
+    </div>
+
+    <script>
+        var checkwrongone = true;
+        var checkwrongtwo = true;
+
+        function checkWrong(type, checker) {
+            switch (type) {
+                case 1:
+                    if (checker.match(/([!,%,&,@,#,$,^,*,?,_,~,',+,.,;,:,0-9,ä-ö,Ä-Ö])/) || checker.length < 2 || checker.length > 15) {
+                        $(".fcheckerbox").addClass("e1230_4");
+                        $(".fcheckerbox").removeClass("e1230_5");
+                        checkwrongone = true;
+                    } else {
+                        $(".fcheckerbox").removeClass("e1230_4");
+                        $(".fcheckerbox").addClass("e1230_5");
+                        checkwrongone = false;
+                    }
+                    break;
+
+                case 2:
+                    if (checker.match(/([!,%,&,@,#,$,^,*,?,_,~,',+,.,;,:,0-9,ä-ö,Ä-Ö])/) || checker.length < 2 || checker.length > 15) {
+                        $(".lcheckerbox").addClass("e1230_4");
+                        $(".lcheckerbox").removeClass("e1230_5");
+                        checkwrongtwo = true;
+                    } else {
+                        $(".lcheckerbox").removeClass("e1230_4");
+                        $(".lcheckerbox").addClass("e1230_5");
+                        checkwrongtwo = false;
+                    }
+                    break;
+            }
+            if (checkwrongone == false) {
+                if (checkwrongtwo == false) {
+                    $(".confirm").removeAttr("disabled");
+                }
+            }
+
+            if (checkwrongone == true) {
+                $(".confirm").attr("disabled", true);
+            }
+
+            if (checkwrongtwo == true) {
+                $(".confirm").attr("disabled", true);
+            }
+        }
+
+        function display(bool) {
+            if (bool) {
+                $("body").show();
+                $(".confirm").attr("disabled", true);
+            } else {
+                $("body").hide();
+                $.post(`https://${GetParentResourceName()}/close`, JSON.stringify({}));
+                $(".last, .first").val('')
+                $(".lcheckerbox, .fcheckerbox").removeClass("e1230_5");
+                $(".lcheckerbox, .fcheckerbox").removeClass("e1230_4");
+                $(".confirm").attr("disabled", true);
+            }
+        }
+
+        function getName() {
+            $.post(`https://${GetParentResourceName()}/getName`, JSON.stringify({
+                first: $(".first").val(),
+                last: $(".last").val()
+            }));
+            display(false)
+        }
+
+        window.onload = function () {
+
+            window.addEventListener("keydown", (e) => {
+                if (e.keyCode == 27 || e.keyCode == 113) {
+                    display(false)
+                }
+            }, false);
+
+            $(".first").keyup(function () {
+                checkWrong(1, $(".first").val());
+            })
+
+            $(".last").keyup(function () {
+                checkWrong(2, $(".last").val());
+            })
+
+            window.addEventListener('message', function (event) {
+                var item = event.data
+                if (item.action == 'UI') {
+                    if (item.display) {
+                        display(true)
+                    }
+                };
+            })
+        };
+    </script>
+    <script src="nui://game/ui/jquery.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap%27');
+
+        * {
+            font-family: Montserrat;
+            color: var(--white);
+            margin: 0px;
+            padding: 0px;
+            user-select: none;
+            border: none;
+            font-weight: 600;
+            font-size: 2.4vh;
+            transition: .3s ease-in-out;
+        }
+
+        body {
+            height: 100%;
+            width: 100%;
+        }
+
+        .container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient);
+            filter: drop-shadow(0px 0px 15px var(--black));
+        }
+
+        .header h1 {
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            font-size: 1.5vh;
+            font-style: italic;
+        }
+
+        .bgbox {
+            position: absolute;
+            width: 56.9vh;
+            height: 28.3vh;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        input {
+            border: 2px solid var(--gray);
+            background: var(--dark-gray);
+            border-radius: 10px;
+        }
+
+        input:hover {
+            border: 2px solid var(--black);
+        }
+
+        input:focus {
+            outline: none;
+            border: 2px solid var(--black);
+        }
+
+        .first {
+            position: absolute;
+            width: 35.1vh;
+            height: 6.6vh;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding-left: 2vh;
+        }
+
+        .last {
+            position: absolute;
+            width: 35.1vh;
+            height: 6.6vh;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding-left: 2vh;
+        }
+
+        .fcheckerbox {
+            position: absolute;
+            top: 20%;
+            left: 5%;
+            transform: translate(-50%, -50%);
+            width: 4vh;
+            height: 4vh;
+        }
+
+        .lcheckerbox {
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            transform: translate(-50%, -50%);
+            width: 4vh;
+            height: 4vh;
+        }
+
+        .e1230_5 {
+            background-image: url(assets/images/correct.png);
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+        }
+
+        .e1230_4 {
+            background-image: url(assets/images/wrong.png);
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+        }
+
+        .confirm,
+        #btn:disabled {
+            position: absolute;
+            width: 20.5vh;
+            height: 4.8vh;
+            bottom: 1vh;
+            left: 50%;
+            font-size: 1.9vh;
+            transform: translate(-50%);
+            background: var(--dark-gray);
+            border-radius: 10px;
+            color: var(--gray)
+        }
+
+        .confirm:hover {
+            cursor: pointer;
+            color: var(--white);
+            text-shadow: 0px 0px 5px var(--white);
+            background: var(--black);
+            box-shadow: 0px 0px 15px var(--dark-gray);
+        }
+
+        .close {
+            position: absolute;
+            width: 15.5vh;
+            height: 4.8vh;
+            top: 4vh;
+            right: 4vh;
+            font-size: 1.9vh;
+            background: var(--dark-gray);
+            border-radius: 10px;
+            color: var(--gray)
+        }
+
+        .close:hover {
+            cursor: pointer;
+            color: var(--white);
+            text-shadow: 0px 0px 5px var(--white);
+            background: var(--red);
+            box-shadow: 0px 0px 15px var(--red);
+        }
+    </style>
+
+</body>
+
+</html>

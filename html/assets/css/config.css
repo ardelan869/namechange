@@ -1,0 +1,8 @@
+:root {
+    --gradient: radial-gradient(circle, rgba(93, 91, 99, 0.5) 0%, rgba(36, 33, 48, 0.8) 100%);
+    --black: rgb(36, 33, 48);
+    --white: white;
+    --red: rgb(207, 7, 0);
+    --gray: rgba(160, 160, 160, 0.5);
+    --dark-gray: rgba(93, 91, 99, 0.5);
+}
